@@ -10,3 +10,6 @@ Usage of logcat:
   -s string
     	Serial Number for the Device to read logcat from
 ```
+
+###Example of Output
+![Sample Output](output.png "Sample Output")

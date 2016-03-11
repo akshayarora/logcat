@@ -23,5 +23,8 @@ _testmain.go
 *.test
 *.prof
 
+#vim stuff
+.*.swp
+
 # The executable for this project
 logcat

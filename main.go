@@ -1,7 +1,12 @@
 package main
 
 import (
+	"bufio"
+	_ "bytes"
 	"fmt"
+	"io"
+	"os/exec"
+	"regexp"
 )
 
 var (
@@ -50,4 +55,47 @@ func main() {
 	text := "%scolored %s%stext%s\n"
 	fmt.Printf(text, ForegroundRed, ForegroundBlack, BackgroundRed, Reset)
 	fmt.Printf(text, ForegroundGreen, ForegroundMagenta, BackgroundGreen, Reset)
+
+	//cmd := exec.Command("adb", `-d logcat -v time "*:S AndroidRuntime:E ZSE:*"`)
+	//cmd := exec.Command("adb", "devices")
+	//cmd := exec.Command("adb", "-s", "00bc1e18894429b5", "logcat", "-v", "time", "\"*:S AndroidRuntime:E ZSE:*\"")
+	cmd := exec.Command("adb", "-s", "00bc1e18894429b5", "logcat", "-v", "time")
+	out, err := cmd.StdoutPipe()
+	if err != nil {
+		fmt.Errorf(err.Error())
+		return
+	}
+	if err := cmd.Start(); err != nil {
+		fmt.Errorf(err.Error())
+		return
+	}
+	printOutput(out)
+	cmd.Wait()
+}
+
+func printOutput(out io.ReadCloser) {
+	in := bufio.NewScanner(out)
+	//                        1 = timestamp                         2=LogLevel 3=Label 4=PID 5=Log
+	re := regexp.MustCompile(`(\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{3}) ([A-Z])\/(\S*)\s*\((\d*)\): (.*)`)
+	for in.Scan() {
+		line := in.Text()
+		if re.MatchString(line) {
+			matches := re.FindStringSubmatch(line)
+			time := matches[1]
+			level := matches[2]
+			label := matches[3]
+			pid := matches[4]
+			message := matches[5]
+			fg := ForegroundWhite
+			switch level {
+			case "E":
+				fg = ForegroundRed
+			case "W":
+				fg = ForegroundYellow
+			}
+			if "AndroidRuntime" == label || "ZSE" == label {
+				fmt.Printf("%s%s %s/%s (%s):%s %s\n", fg, time, level, label, pid, message, Reset)
+			}
+		}
+	}
 }

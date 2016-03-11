@@ -115,6 +115,9 @@ func parseFilters(s string) map[string]LogLevel {
 }
 
 func shouldLog(ll LogLevel, label string, filters map[string]LogLevel) bool {
+	if filters == nil {
+		return true
+	}
 	level, ok := filters[label]
 	if !ok {
 		level, ok = filters[ALL_APPS_LABEL]

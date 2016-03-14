@@ -145,8 +145,6 @@ func printOutput(out io.ReadCloser, filters map[string]LogLevel) {
 				fg := colorForLevel(level)
 				fmt.Printf("%s%s %s/%s (%s):%s %s\n", fg, time, level, label, pid, message, Reset)
 			}
-		} else {
-			fmt.Printf("%s%s%s\n", ForegroundRed, line, Reset)
 		}
 	}
 }

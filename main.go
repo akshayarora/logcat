@@ -131,7 +131,7 @@ func shouldLog(ll LogLevel, label string, filters map[string]LogLevel) bool {
 func printOutput(out io.ReadCloser, filters map[string]LogLevel) {
 	in := bufio.NewScanner(out)
 	//                        1 = timestamp                         2=LogLevel 3=Label 4=PID 5=Log
-	re := regexp.MustCompile(`(\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{3}) ([A-Z])\/(\S*)\s*\((\d*)\): (.*)`)
+	re := regexp.MustCompile(`(\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{3}) ([A-Z])\/(\S*)\s*\(\s*(\d*)\): (.*)`)
 	for in.Scan() {
 		line := in.Text()
 		if re.MatchString(line) {
